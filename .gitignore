@@ -7,3 +7,4 @@ __pycache__/
 baselines-results*
 results-baselines*
 results/**/*.log
+build/
