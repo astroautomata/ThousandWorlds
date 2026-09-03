@@ -10,22 +10,29 @@ import thousandworlds as tw
 @pytest.mark.requires_dataset
 def test_load_all_obs_standard(data_dir):
     bundle = tw.load("multi-partial", "standard", data_dir=data_dir, space="grid")
-    assert bundle.X_train.shape == (1626, 8)
-    assert bundle.X_test.shape == (100, 8)
-    assert bundle.Y_train.shape == (1626, 53, 32, 64)
-    assert bundle.Y_test.shape == (100, 53, 32, 64)
-    assert bundle.field_mask_train.shape == (1626, 53)
-    assert bundle.field_mask_test.shape == (100, 53)
+    assert bundle.X_train.shape == (1527, 8)
+    assert bundle.X_test.shape == (128, 8)
+    assert bundle.Y_train.shape == (1527, 53, 32, 64)
+    assert bundle.Y_test.shape == (128, 53, 32, 64)
+    assert bundle.field_mask_train.shape == (1527, 53)
+    assert bundle.field_mask_test.shape == (128, 53)
     assert np.array_equal(bundle.meta_test["simulation_id"].to_numpy(dtype=np.int32), bundle.test_ids)
 
 
 @pytest.mark.requires_dataset
 def test_load_complete_obs_spectral(data_dir):
     bundle = tw.load("multi-complete", "standard", data_dir=data_dir, space="spectral")
-    assert bundle.Y_train.shape == (1538, 48, 484)
-    assert bundle.Y_test.shape == (90, 48, 484)
+    assert bundle.Y_train.shape == (1443, 48, 484)
+    assert bundle.Y_test.shape == (121, 48, 484)
     assert bundle.field_mask_train.all()
     assert bundle.field_mask_test.all()
+
+
+@pytest.mark.requires_dataset
+def test_load_single_complete(data_dir):
+    bundle = tw.load("single-complete", "standard", data_dir=data_dir)
+    assert bundle.Y_train.shape == (203, 48, 32, 64)
+    assert bundle.Y_test.shape == (74, 48, 32, 64)
 
 
 def test_download_dataset_dispatches_dataset_archive(monkeypatch, tmp_path):
@@ -107,7 +114,12 @@ def test_download_baselines_dispatches_each_archive(monkeypatch, tmp_path):
             tmp_path,
             True,
             frozenset({"predictions.npz"}),
-            ("results/README.md", "results/scores.csv", "results/tables"),
+            (
+                "results/README.md",
+                "results/scores.csv",
+                "results/scores_5seeds.csv",
+                "results/tables",
+            ),
         )
         for name in tw.data.BASELINES_RESULTS_ARCHIVES
     ]
@@ -186,25 +198,30 @@ def test_baseline_extract_preserves_existing_results_docs(tmp_path):
     archive_path = tmp_path / tw.data.BASELINES_RESULTS_ARCHIVES[0]
     readme = tmp_path / "new_readme.md"
     scores = tmp_path / "new_scores.csv"
+    scores_5seeds = tmp_path / "new_scores_5seeds.csv"
     table = tmp_path / "new_rmse.md"
     prediction = tmp_path / "predictions.npz"
     readme.write_text("new readme\n", encoding="utf-8")
     scores.write_text("new scores\n", encoding="utf-8")
+    scores_5seeds.write_text("new five-seed scores\n", encoding="utf-8")
     table.write_text("new table\n", encoding="utf-8")
     prediction.write_bytes(b"new prediction")
     with tarfile.open(archive_path, "w:gz") as tar:
         tar.add(readme, arcname="results/README.md")
         tar.add(scores, arcname="results/scores.csv")
+        tar.add(scores_5seeds, arcname="results/scores_5seeds.csv")
         tar.add(table, arcname="results/tables/single-complete/standard/rmse.md")
         tar.add(prediction, arcname="results/models/single-complete/train_mean/predictions.npz")
 
     existing_readme = tmp_path / "results/README.md"
     existing_scores = tmp_path / "results/scores.csv"
+    existing_scores_5seeds = tmp_path / "results/scores_5seeds.csv"
     existing_table = tmp_path / "results/tables/single-complete/standard/rmse.md"
     existing_pred = tmp_path / "results/models/single-complete/train_mean/predictions.npz"
     for path, text in (
         (existing_readme, "old readme\n"),
         (existing_scores, "old scores\n"),
+        (existing_scores_5seeds, "old five-seed scores\n"),
         (existing_table, "old table\n"),
     ):
         path.parent.mkdir(parents=True, exist_ok=True)
@@ -214,11 +231,20 @@ def test_baseline_extract_preserves_existing_results_docs(tmp_path):
         archive_path,
         tmp_path,
         force=True,
-        skip_existing_members=("results/README.md", "results/scores.csv", "results/tables"),
+        skip_existing_members=(
+            "results/README.md",
+            "results/scores.csv",
+            "results/scores_5seeds.csv",
+            "results/tables",
+        ),
     )
 
     assert existing_readme.read_text(encoding="utf-8") == "old readme\n"
     assert existing_scores.read_text(encoding="utf-8") == "old scores\n"
+    assert (
+        existing_scores_5seeds.read_text(encoding="utf-8")
+        == "old five-seed scores\n"
+    )
     assert existing_table.read_text(encoding="utf-8") == "old table\n"
     assert existing_pred.read_bytes() == b"new prediction"
 

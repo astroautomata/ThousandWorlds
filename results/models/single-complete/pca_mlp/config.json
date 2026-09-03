@@ -7,14 +7,15 @@
   "dtype": "float64",
   "device": "cuda",
   "pca_mlp": {
-    "latent_dim": 50,
+    "latent_dim": 20,
     "hidden_width": 512,
+    "depth": 2,
     "activation": "silu",
     "ppca_iters": 50,
     "num_steps": 4000,
-    "lr": 0.0003,
+    "lr": 0.001,
     "weight_decay": 0.0001,
-    "hard_stop_step": 330,
+    "hard_stop_step": 300,
     "linear_trend_cfg": {
       "enabled": true,
       "lambda": 0.001,

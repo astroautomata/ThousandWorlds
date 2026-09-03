@@ -7,7 +7,7 @@
   "dtype": "float64",
   "device": "cpu",
   "pca_gbt": {
-    "latent_dim": 150,
+    "latent_dim": 50,
     "learning_rate": 0.1,
     "max_iter": 600,
     "max_leaf_nodes": 15,
@@ -38,27 +38,11 @@
       63
     ],
     "objective": "equal_group_normalized_rmse",
-    "scores": [
-      [
-        0.4910624109208584,
-        0.4910624109208584,
-        0.4910624109208584
-      ],
-      [
-        0.478977457433939,
-        0.478977457433939,
-        0.478977457433939
-      ],
-      [
-        0.4674520380795002,
-        0.4674520380795002,
-        0.4674520380795002
-      ]
-    ]
+    "scores": null
   },
   "best": {
     "learning_rate": 0.1,
     "max_leaf_nodes": 15,
-    "cv_equal_group_normalized_rmse": 0.4674520380795002
+    "cv_equal_group_normalized_rmse": null
   }
 }

@@ -1,0 +1,32 @@
+{
+  "method": "conv_decoder",
+  "subset": "single-complete",
+  "data_dir": "dataset",
+  "out_dir": "results/models/single-complete/conv_decoder",
+  "seed": 0,
+  "dtype": "float32",
+  "device": "cuda",
+  "conv_decoder": {
+    "seed_channels": 2048,
+    "convs_per_stage": 2,
+    "batch_size": 32,
+    "num_steps": 3000,
+    "lr": 9.999999999999999e-05,
+    "weight_decay": 0.3,
+    "hard_stop_step": 2100,
+    "optimizer": "AdamW",
+    "target_normalization": "observed_training_latitude_weighted_per_field",
+    "loss": "latitude_weighted_masked_mse_divided_by_weighted_valid_mass",
+    "seed_grid": [
+      4,
+      8
+    ],
+    "stage_channels": [
+      "C",
+      "C/2",
+      "C/4"
+    ],
+    "equatorial_symmetry": true,
+    "preset": null
+  }
+}

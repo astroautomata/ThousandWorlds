@@ -33,10 +33,9 @@ configs:
 
 <img src="imgs/MASCOT.png" align="right" width="220" style="margin-top: -1.25rem;" alt="ThousandWorlds mascot">
 
-ThousandWorlds is a benchmark for emulating exoplanet climates: **1760
-simulations** across **5 GCMs**, **8 planet parameters**, and atmospheric
+ThousandWorlds is a benchmark for emulating exoplanet climates: **1689 simulations** across **5 GCMs**, **8 planet parameters**, and atmospheric
 variables on a 32 x 64 x 10 latitude-longitude-pressure grid. It includes three
-nested benchmark subsets, two evaluation protocols, and eight released baseline
+nested benchmark subsets, two evaluation protocols, and ten released baseline
 methods.
 
 [![Code](https://img.shields.io/badge/code-GitHub-181717.svg?logo=github)](https://github.com/edstevenson/ThousandWorlds)
@@ -93,17 +92,17 @@ realism:
 
 | Subset | Simulations | Fields | Description |
 | --- | ---: | ---: | --- |
-| `single-complete` | 256 | 48 | Smaller subset; simulations from a single GCM, complete observations only. |
-| `multi-complete` | 1659 | 48 | All 5 GCMs, still with no missing fields. |
-| `multi-partial` | 1760 | 53 | Full dataset; all 5 GCMs, with missing fields represented as NaNs. |
+| `single-complete` | 277 | 48 | Smaller subset; simulations from a single GCM, complete observations only. |
+| `multi-complete` | 1595 | 48 | All 5 GCMs, still with no missing fields. |
+| `multi-partial` | 1689 | 53 | Full dataset; all 5 GCMs, with missing fields represented as NaNs. |
 
 The subset split files contain:
 
 | File | `single-complete` | `multi-complete` | `multi-partial` |
 | --- | ---: | ---: | ---: |
-| `train.csv` | 206 | 1538 | 1626 |
-| `test.csv` | 50 | 90 | 100 |
-| `test_shared_planets_only.csv` | - | 58 | 60 |
+| `train.csv` | 203 | 1443 | 1527 |
+| `test.csv` | 74 | 121 | 128 |
+| `test_shared_planets_only.csv` | - | 62 | 64 |
 | `held_out_aux.csv` | - | 31 | 34 |
 
 `held_out_aux.csv` is excluded from train and test to prevent train-test leakage (it contains simulations from auxiliary GCMs that correspond to identical planets present in the test set).
@@ -118,9 +117,9 @@ includes `is_target_gcm`, `in_target_physical_domain`, `planet_id`, and
 
 | Parameter | Range |
 | --- | --- |
-| Radius (Earth radii) | [0.7, 1.4] |
-| Surface gravity (m s^-2) | [6.0, 16.0] |
-| Rotation period (days) | [0.1, 1000.0] |
+| Radius (Earth radii) | [0.7, 1.75] |
+| Surface gravity (m s^-2) | [6.0, 17.0] |
+| Rotation period (days) | [1.0, 200.0] |
 | Surface pressure (bar) | [0.5, 5] |
 | CO2 volume fraction (%) | [0, 100] |
 | CH4 volume fraction (%) | [0, 5] |
@@ -150,10 +149,9 @@ The gridded field archives are:
 
 | File | Shape | Contents |
 | --- | --- | --- |
-| `dataset/fields/all-obs.npz` | `(1760, 53, 32, 64)` | Field archive covering all 5 GCMs with structured whole-field missingness. |
-| `dataset/fields/complete-obs-only.npz` | `(1659, 48, 32, 64)` | Complete-observation field archive. |
+| `dataset/fields/all-obs.npz` | `(1689, 53, 32, 64)` | Field archive covering all 5 GCMs with structured whole-field missingness. |
+| `dataset/fields/complete-obs-only.npz` | `(1595, 48, 32, 64)` | Complete-observation field archive. |
 
-**Spectral Coefficients:**
 The spectral coefficient archives mirror those field archives with T21
 spherical harmonic coefficients: `dataset/coefficients/*.npz` stores
 `coefficients` with 484 coefficients per field and a `field_mask` for missing
@@ -164,14 +162,13 @@ as false entries in the spectral `field_mask`.
 
 The package includes loaders and metrics for two benchmark protocols:
 
-- **Standard**: the main test protocol, ideal for ML model comparison.
+- **Standard**: the main test protocol.
 - **Shared-planets**: evaluate on planets shared across target and auxiliary
   GCMs; used to assess performance relative to inter-GCM error, i.e. how close
   a model gets to the epistemic uncertainty floor of the problem.
 
-Released baselines include train mean, kNN, PCA ridge, PCA-MLP, Coord-MLP,
-Coord-DeepONet, PPCA-ICM, and GPLFR. Baseline artifacts include predictions,
-resolved configs, and metrics JSON files.
+Headline baselines are `train_mean`, `knn`, `pca_gbt`, `coord_mlp`, `coord_deeponet`, `pca_mlp`, `conv_decoder`, `sfno`, `ppca_icm`, and `gplfr`. PCA-Ridge (`pca_ridge`) is the nonlinearity ablation. The baseline archives include predictions,
+the config each run used, and metrics JSON files.
 
 ## Links
 
@@ -193,3 +190,10 @@ If you use ThousandWorlds, please cite the paper:
   doi = {10.48550/arXiv.2606.18338}
 }
 ```
+
+## Versions
+
+v2.0.0 replaces v1.0.0. It is a small update to the dataset to fix a couple
+bugs in some simulations and add a few more; the full list is in the
+[changelog](https://github.com/edstevenson/ThousandWorlds/blob/main/CHANGELOG.md).
+v1.0.0 remains available for reproducing earlier work.

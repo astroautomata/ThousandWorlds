@@ -1,22 +1,47 @@
 {
-  "method": "gplfr",
-  "subset": "multi-partial",
+  "artifact_provenance": {
+    "accepted_inputs_sha256": "1ec9b1748c7f91396c991b8901a52e4f67bed6f0f081529f34b574c661419a0a",
+    "complete_sha256": "08bca0311080a685aac3791c41ae18351f2dd2b291527418b2c480c08ca232d4",
+    "dataset_acceptance_sha256": "4abc49eed2169c37a9f20aa86b719b576b19fc908ec38cef897a2e4a9edeaf25",
+    "dataset_counts_sha256": "245fdb90b52894c7ee22323252b6759d05f6ded8255d44f2cc84e3fefec1414d",
+    "dataset_vintage": "tw-v2-aug20",
+    "fold_set_sha256": "fb7217f0829690551c174ad5c4abf848a8a0492c13db6256baaa7b2f15489885",
+    "phase4_gplfr_extensions_sha256": "400a643fcabe69a98a90c5743f623a7d35fa52ea00e5cac8bf97742878bc04e2",
+    "phase4_manifest_sha256": "6f3b055d8a0f08083392112521b35530f2b897abd4f35253e4a6c500a210db01",
+    "producer_manifest_sha256": "8b19b9f9c57931f32da2b27f6e50d6461a2cd8373add4e02c74c8d6b4c14334b",
+    "producer_provenance_sha256": "7cb0084687eb4db62601d343350150d9360b9012e75b3dee7b107e022fd883f5",
+    "producer_tasks_sha256": "fae9a783d6096dc9bffde7209d0e309f1101513f6d858287018bed10689f0607",
+    "schema_version": 1,
+    "selection_sha256": "4c78e3c11f2f3cca5f56f2ecf0d13fd68a676fde3b502bd353f52fba735da8ed",
+    "source_artifact_sha256": "552be115f9bf7a5dd07a906b6e7a673885a7246bc3eae18d0ec291bdb2d8d157",
+    "source_config_sha256": "552be115f9bf7a5dd07a906b6e7a673885a7246bc3eae18d0ec291bdb2d8d157",
+    "source_metrics_sha256": "597c74a238fc8e51e5e1331df79195315e9b5f2402858bce6c72a81b8cfa564a",
+    "source_predictions_sha256": "9bddfde8dca42d5c23f00243ce62e563fb3f072512849074c8589ca9e9828184",
+    "source_snapshot_sha256": "d83d3924d9db9d7e81934526df3bb96febbc8b6d6af5edb9c7a52ada57c4b045",
+    "train_split_sha256": "5ca25a9aedf6efe32952e6b9dffa2f5723c1c33ead7ca4fdc3d028de1b47d10c",
+    "variant": "vanilla"
+  },
+  "comparison_variant": "gplfr",
   "data_dir": "dataset",
-  "out_dir": "results/models/multi-partial/gplfr_domain_informed_comparison",
-  "seed": 0,
-  "dtype": "float64",
+  "dataset_vintage": "tw-v2-aug20",
   "device": "cuda",
+  "dtype": "float64",
   "gplfr": {
-    "latent_dim": 150,
-    "num_training_steps": 115,
     "inverse_temperature": 0.1,
+    "kernel": "matern52",
+    "latent_dim": 150,
     "latent_nugget": 0.1,
+    "n_samples": 64,
+    "num_training_steps": 115,
     "optimizer": {
       "lr_Z": 0.1,
       "lr_global": 0.3
     },
-    "variable_weights": "fixed",
-    "output_coregionalization": "none"
+    "output_coregionalization": "none",
+    "variable_weights": "fixed"
   },
-  "comparison_variant": "gplfr"
+  "method": "gplfr",
+  "out_dir": "results/models/multi-partial/gplfr_domain_informed_comparison",
+  "seed": 0,
+  "subset": "multi-partial"
 }

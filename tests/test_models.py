@@ -4,6 +4,7 @@ import subprocess
 import sys
 from copy import deepcopy
 from pathlib import Path
+from types import SimpleNamespace
 
 import numpy as np
 import pytest
@@ -18,7 +19,7 @@ from thousandworlds.models._torch_kernels import build_design_matrix
 from thousandworlds.models._gplfr_core import GPLFRCore
 from thousandworlds.models._gplfr_weighting import retrieve_field_group_index
 from thousandworlds.models._common import enforce_equatorial_symmetry_grid, equal_group_normalized_rmse_grid, masked_mean_grid
-from thousandworlds.models.pca_mlp import PCAMLP, _equal_group_mean
+from thousandworlds.models.pca_mlp import PCAMLP, _ScoreMLP, _equal_group_mean
 from thousandworlds.models.pca_ridge import PCARidge, fit_latent_ridge
 
 
@@ -84,6 +85,76 @@ def test_knn_cv_objective_equal_weights_normalized_variable_groups():
     np.testing.assert_allclose(score, 3.0, atol=1.0e-6)
 
 
+def test_knn_plain_cv_fits_preprocessing_inside_each_fold(monkeypatch):
+    n = 10
+    grid = SimpleNamespace(
+        Y_train=np.arange(n, dtype=np.float32).reshape(n, 1, 1, 1),
+        X_train=np.arange(n, dtype=np.float32).reshape(n, 1),
+        X_test=np.array([[10.0]], dtype=np.float32),
+        field_mask_train=np.ones((n, 1), dtype=bool),
+        raw_field_names=["surface_temperature"],
+    )
+    data = SimpleNamespace(
+        grid_bundle=grid,
+        X_train_std=grid.X_train.copy(),
+        X_test_std=grid.X_test.copy(),
+        s_train=np.zeros(n, dtype=np.int64),
+        s_test=np.zeros(1, dtype=np.int64),
+        gcm_labels=["only"],
+        stats=object(),
+    )
+    calls = []
+
+    def prepare_fold(given, train_idx):
+        calls.append(np.asarray(train_idx))
+        return given
+
+    monkeypatch.setattr(run_model, "prepare_tw_data", lambda *args, **kwargs: data)
+    monkeypatch.setattr(run_model, "prepare_tw_fold", prepare_fold)
+    monkeypatch.setattr(
+        run_model,
+        "average_space_grid",
+        lambda values, *args, **kwargs: np.asarray(values),
+    )
+    monkeypatch.setattr(
+        run_model.tw,
+        "inverse_preprocess_outputs_grid",
+        lambda values, *args, **kwargs: np.asarray(values),
+    )
+    monkeypatch.setattr(
+        run_model,
+        "field_rmse_scale_grid",
+        lambda *args, **kwargs: np.ones(1, dtype=np.float32),
+    )
+    monkeypatch.setattr(
+        run_model,
+        "equal_group_normalized_rmse_grid",
+        lambda *args, **kwargs: 0.0,
+    )
+    monkeypatch.setattr(
+        run_model,
+        "enforce_equatorial_symmetry_grid",
+        lambda values, *args, **kwargs: values,
+    )
+    args = SimpleNamespace(
+        subset="multi-partial",
+        data_dir=Path("unused"),
+        k="1",
+        gcm_penalty="0",
+        best_k=None,
+        best_gcm_penalty=None,
+        n_folds=5,
+        seed=0,
+    )
+
+    run_model._run_knn(args)
+
+    expected = run_model._kfold_indices(n, 5, 0)
+    assert len(calls) == 5
+    for actual, (train_idx, _) in zip(calls, expected, strict=True):
+        np.testing.assert_array_equal(actual, train_idx)
+
+
 def test_equatorial_symmetry_grid_enforces_scalar_symmetry_and_v_antisymmetry():
     Y = np.array([[
         [[1.0], [3.0], [5.0], [7.0]],
@@ -117,7 +188,7 @@ def test_run_model_help_lists_supported_methods():
         text=True,
         check=True,
     )
-    assert "{train_mean,knn,pca_ridge,pca_mlp,pca_gbt,ppca_icm,gplfr,coord_mlp,coord_deeponet}" in result.stdout
+    assert "{train_mean,knn,pca_ridge,pca_mlp,pca_gbt,ppca_icm,gplfr,coord_mlp,coord_deeponet,conv_decoder,sfno}" in result.stdout
     assert "1,2,3,5,10" in result.stdout
     assert "0.0,0.3,1.0,3.0,10.0" in result.stdout
     assert "--lambda-reg" in result.stdout
@@ -127,38 +198,72 @@ def test_run_model_help_lists_supported_methods():
 
 def test_gplfr_resolver_defaults_and_config_replay():
     args = run_model.argparse.Namespace(
+        subset="multi-partial",
         latent_dim=60,
         gplfr_num_training_steps=3000,
         gplfr_inverse_temperature=0.25,
         gplfr_latent_nugget=0.03,
+        gplfr_n_samples=2,
+        gplfr_kernel="rbf",
         _explicit_args=set(),
     )
     hparams = run_model._gplfr_hparams(args)
     assert hparams["latent_dim"] == 150
-    assert hparams["num_training_steps"] == 2000
+    assert hparams["num_training_steps"] == 115
     assert hparams["inverse_temperature"] == 0.1
     assert hparams["latent_nugget"] == 0.1
     assert hparams["lr_Z"] == 0.1
     assert hparams["lr_global"] == 0.3
-    assert hparams["variable_weights"] == "learned_per_group"
-    assert hparams["output_coregionalization"] == "field_coregionalized"
+    assert hparams["variable_weights"] == "fixed"
+    assert hparams["output_coregionalization"] == "none"
+    assert hparams["n_samples"] == 64
+    assert hparams["kernel"] == "matern52"
 
-    args._explicit_args = {"latent_dim", "gplfr_num_training_steps", "gplfr_inverse_temperature", "gplfr_latent_nugget"}
+    args._explicit_args = {"latent_dim", "gplfr_num_training_steps", "gplfr_inverse_temperature", "gplfr_latent_nugget", "gplfr_n_samples", "gplfr_kernel"}
     hparams = run_model._gplfr_hparams(args)
     assert hparams["latent_dim"] == 60
     assert hparams["num_training_steps"] == 3000
     assert hparams["inverse_temperature"] == 0.25
     assert hparams["latent_nugget"] == 0.03
+    assert hparams["n_samples"] == 2
+    assert hparams["kernel"] == "rbf"
 
-    replay = run_model._gplfr_hparams(args, {"gplfr": {"latent_dim": 4, "num_training_steps": 29, "inverse_temperature": 0.5, "latent_nugget": 0.01, "variable_weights": "fixed", "output_coregionalization": "none", "optimizer": {"lr_Z": 0.2, "lr_global": 0.4}}})
+    replay = run_model._gplfr_hparams(args, {"gplfr": {"kernel": "matern32", "latent_dim": 4, "num_training_steps": 29, "inverse_temperature": 0.5, "latent_nugget": 0.01, "n_samples": 3, "variable_weights": "fixed", "output_coregionalization": "none", "optimizer": {"lr_Z": 0.2, "lr_global": 0.4}}})
     assert replay["latent_dim"] == 4
     assert replay["num_training_steps"] == 29
     assert replay["inverse_temperature"] == 0.5
     assert replay["latent_nugget"] == 0.01
+    assert replay["n_samples"] == 3
+    assert replay["kernel"] == "matern32"
     assert replay["variable_weights"] == "fixed"
     assert replay["output_coregionalization"] == "none"
     assert replay["lr_Z"] == 0.2
     assert replay["lr_global"] == 0.4
+
+
+@pytest.mark.parametrize(
+    ("subset", "kernel", "steps", "beta", "nugget"),
+    (
+        ("multi-partial", "matern52", 115, 0.1, 0.1),
+        ("multi-complete", "matern52", 120, 0.1, 0.03),
+        ("single-complete", "matern32", 30, 0.03, 0.03),
+    ),
+)
+def test_gplfr_subset_presets_match_published_configs(
+    subset, kernel, steps, beta, nugget
+):
+    args = run_model.argparse.Namespace(subset=subset, _explicit_args=set())
+
+    hparams = run_model._gplfr_hparams(args)
+
+    assert (hparams["kernel"], hparams["num_training_steps"]) == (kernel, steps)
+    assert hparams["inverse_temperature"] == beta
+    assert hparams["latent_nugget"] == nugget
+    assert hparams["n_samples"] == 64
+    assert (hparams["variable_weights"], hparams["output_coregionalization"]) == (
+        "fixed",
+        "none",
+    )
 
 
 def test_gplfr_weighting_accepts_public_radiation_field_names():
@@ -191,12 +296,334 @@ def test_ppca_icm_tuned_preset_allows_explicit_cli_overrides():
     assert hparams["gp_steps"] == 4000
 
 
+def test_ppca_icm_resolved_config_replays_frozen_config(tmp_path):
+    frozen = {
+        "ppca_icm": {
+            "latent_dim": 4,
+            "kernel": "matern32",
+            "kernel_mode": "shared",
+            "ppca_iters": 2,
+            "gp_steps": 2,
+            "gp_lr": 0.003,
+            "n_samples": 2,
+            "hard_stop_step": 2,
+            "ell_init": 4.0,
+        }
+    }
+    args = run_model.argparse.Namespace(
+        method="ppca_icm",
+        subset="multi-partial",
+        seed=0,
+        dtype="float32",
+        device="cuda",
+        ppca_icm_preset="tuned",
+        _config=frozen,
+    )
+
+    assert frozen["ppca_icm"].items() <= run_model._resolved_config(
+        args, out_dir=tmp_path / "out", data_dir=tmp_path
+    )["ppca_icm"].items()
+
+
+@pytest.mark.parametrize("kernel_mode", ["shared", "per_pc"])
+def test_ppca_icm_zero_hard_stop_supports_finite_predictions(kernel_mode):
+    torch.manual_seed(0)
+    X = torch.tensor(
+        [[0.0, 0.0], [1.0, 0.0], [0.0, 1.0], [1.0, 1.0]],
+        dtype=torch.float64,
+    )
+    s = torch.tensor([0, 1, 0, 1])
+    Y = torch.randn((4, 3, 2), dtype=torch.float64)
+    field_mask = torch.ones((4, 2), dtype=torch.bool)
+    sh_mask = torch.ones((3, 2), dtype=torch.bool)
+    model = models.PPCAICM(
+        latent_dim=1,
+        kernel_mode=kernel_mode,
+        dtype=torch.float64,
+        device="cpu",
+    )
+
+    model.fit(
+        X,
+        s,
+        Y,
+        field_mask=field_mask,
+        sh_mask=sh_mask,
+        ppca_iters=2,
+        gp_steps=2,
+        hard_stop_step=0,
+    )
+
+    assert model.gp_fit_stats_["shared"]["steps_run"] == 0
+    if kernel_mode == "per_pc":
+        assert model.gp_fit_stats_["per_pc"]["steps_run"] == 0
+    prediction = model.predict(X[:2], s[:2])
+    samples = model.predict_samples(
+        X[:2],
+        s[:2],
+        n_post_samples=3,
+        seed=0,
+    )
+    assert prediction.shape == (2, 3, 2)
+    assert samples.shape == (3, 2, 3, 2)
+    assert torch.isfinite(prediction).all()
+    assert torch.isfinite(samples).all()
+
+
+def test_ppca_icm_rejects_zero_schedule_even_with_zero_hard_stop():
+    model = models.PPCAICM(
+        latent_dim=1,
+        kernel_mode="shared",
+        dtype=torch.float64,
+        device="cpu",
+    )
+
+    with pytest.raises(ValueError, match="gp_steps"):
+        model.fit(
+            torch.tensor([[0.0], [1.0]], dtype=torch.float64),
+            torch.zeros(2, dtype=torch.long),
+            torch.randn((2, 2, 1), dtype=torch.float64),
+            field_mask=torch.ones((2, 1), dtype=torch.bool),
+            sh_mask=torch.ones((2, 1), dtype=torch.bool),
+            ppca_iters=1,
+            gp_steps=0,
+            hard_stop_step=0,
+        )
+
+
+def test_pca_mlp_zero_hard_stop_supports_finite_prediction():
+    torch.manual_seed(0)
+    X = torch.tensor(
+        [[0.0, 0.0], [1.0, 0.0], [0.0, 1.0], [1.0, 1.0]],
+        dtype=torch.float64,
+    )
+    s = torch.tensor([0, 1, 0, 1])
+    Y = torch.randn((4, 3, 2), dtype=torch.float64)
+    field_mask = torch.ones((4, 2), dtype=torch.bool)
+    sh_mask = torch.ones((3, 2), dtype=torch.bool)
+    model = PCAMLP(
+        latent_dim=1,
+        hidden_width=4,
+        dtype=torch.float64,
+        device="cpu",
+    )
+
+    model.fit(
+        X,
+        s,
+        Y,
+        field_mask=field_mask,
+        sh_mask=sh_mask,
+        ppca_iters=2,
+        num_steps=2,
+        hard_stop_step=0,
+    )
+
+    assert model.mlp_fit_stats_["steps_run"] == 0
+    prediction = model.predict(X[:2], s[:2])
+    assert prediction.shape == (2, 3, 2)
+    assert torch.isfinite(prediction).all()
+
+
+def test_pca_mlp_rejects_zero_schedule_even_with_zero_hard_stop():
+    model = PCAMLP(
+        latent_dim=1,
+        hidden_width=4,
+        dtype=torch.float64,
+        device="cpu",
+    )
+
+    with pytest.raises(ValueError, match="num_steps"):
+        model.fit(
+            torch.tensor([[0.0], [1.0]], dtype=torch.float64),
+            torch.zeros(2, dtype=torch.long),
+            torch.randn((2, 2, 1), dtype=torch.float64),
+            field_mask=torch.ones((2, 1), dtype=torch.bool),
+            sh_mask=torch.ones((2, 1), dtype=torch.bool),
+            ppca_iters=1,
+            num_steps=0,
+            hard_stop_step=0,
+        )
+
+
 def test_gplfr_public_surface_uses_core_module():
     from thousandworlds.models.gplfr import GPLFR
 
     assert models.GPLFR.__name__ == GPLFR.__name__ == "GPLFR"
     assert models.GPLFR.__module__.endswith("models.gplfr")
     assert GPLFRCore.__name__ == "GPLFRCore"
+    assert GPLFR(latent_dim=2, kernel="rbf", device="cpu").kernel == "rbf"
+
+
+def test_gplfr_exposes_training_checkpoint_callback():
+    from thousandworlds.models.gplfr import GPLFR
+
+    assert "checkpoint_callback" in inspect.signature(GPLFR.fit).parameters
+    assert "checkpoint_callback" in inspect.signature(GPLFRCore.fit).parameters
+    calls = []
+    model = GPLFR(
+        latent_dim=1,
+        num_training_steps=2,
+        log_every=1,
+        variable_weights="fixed",
+        output_coregionalization="none",
+        dtype=torch.float64,
+        device="cpu",
+    )
+    model.fit(
+        torch.tensor([[0.0, 0.0], [1.0, 0.0], [0.0, 1.0]]),
+        torch.zeros(3, dtype=torch.long),
+        torch.randn(3, 4, 1),
+        field_mask=torch.ones(3, 1, dtype=torch.bool),
+        sh_mask=torch.ones(4, 1, dtype=torch.bool),
+        field_names=["surface_temperature"],
+        n_sim_types=1,
+        verbose=False,
+        checkpoint_callback=lambda core, guide, step: calls.append(step),
+    )
+    assert calls == [0, 1]
+
+
+def test_gplfr_exponential_decay_uses_requested_rates_for_each_update(monkeypatch):
+    import pyro
+    from thousandworlds.models.gplfr import GPLFR
+
+    rates: dict[int, list[float]] = {}
+    captured_svi = []
+    adam_step = torch.optim.Adam.step
+
+    def capture_rates(optimizer, *args, **kwargs):
+        rates.setdefault(id(optimizer), []).append(optimizer.param_groups[0]["lr"])
+        return adam_step(optimizer, *args, **kwargs)
+
+    monkeypatch.setattr(torch.optim.Adam, "step", capture_rates)
+    model = GPLFR(
+        latent_dim=1,
+        num_training_steps=3,
+        lr_gamma=0.5,
+        log_every=1,
+        variable_weights="fixed",
+        output_coregionalization="none",
+        dtype=torch.float64,
+        device="cpu",
+    )
+    model.fit(
+        torch.tensor([[0.0, 0.0], [1.0, 0.0], [0.0, 1.0]]),
+        torch.zeros(3, dtype=torch.long),
+        torch.tensor([[[0.1], [0.2], [0.3], [0.4]], [[0.2], [0.3], [0.4], [0.5]], [[0.3], [0.4], [0.5], [0.6]]]),
+        field_mask=torch.ones(3, 1, dtype=torch.bool),
+        sh_mask=torch.ones(4, 1, dtype=torch.bool),
+        field_names=["surface_temperature"],
+        n_sim_types=1,
+        verbose=False,
+        diagnostics_callback=lambda core, guide, svi, step, loss, Y, X, s: captured_svi.append(svi),
+    )
+
+    observed = {
+        pyro.get_param_store().param_name(param).rsplit(".", 1)[-1]: rates[id(scheduler.optimizer)]
+        for param, scheduler in captured_svi[-1].optim.optim_objs.items()
+    }
+    latent = [history for name, history in observed.items() if name in {"Z_T", "U_T"}]
+    global_ = [history for name, history in observed.items() if name not in {"Z_T", "U_T"}]
+    assert latent and global_
+    assert all(history == [0.1, 0.05, 0.025] for history in latent)
+    assert all(history == [0.3, 0.15, 0.075] for history in global_)
+    assert model.fit_stats_["lr_gamma"] == 0.5
+
+
+def test_gplfr_default_decay_matches_explicit_one():
+    from thousandworlds.models.gplfr import GPLFR
+
+    X = torch.tensor([[0.0, 0.0], [1.0, 0.0], [0.0, 1.0]])
+    s = torch.zeros(3, dtype=torch.long)
+    Y = torch.tensor([[[0.1], [0.2], [0.3], [0.4]], [[0.2], [0.3], [0.4], [0.5]], [[0.3], [0.4], [0.5], [0.6]]])
+    fit_kwargs = {
+        "field_mask": torch.ones(3, 1, dtype=torch.bool),
+        "sh_mask": torch.ones(4, 1, dtype=torch.bool),
+        "field_names": ["surface_temperature"],
+        "n_sim_types": 1,
+        "seed": 7,
+        "verbose": False,
+    }
+    model_kwargs = {
+        "latent_dim": 1,
+        "num_training_steps": 3,
+        "log_every": 1,
+        "variable_weights": "fixed",
+        "output_coregionalization": "none",
+        "dtype": torch.float64,
+        "device": "cpu",
+    }
+    default = GPLFR(**model_kwargs)
+    explicit = GPLFR(**model_kwargs, lr_gamma=1.0)
+
+    default.fit(X, s, Y, **fit_kwargs)
+    explicit.fit(X, s, Y, **fit_kwargs)
+
+    assert default.fit_stats_["loss_history"] == explicit.fit_stats_["loss_history"]
+    for name in default.model_.posterior_samples_:
+        torch.testing.assert_close(default.model_.posterior_samples_[name], explicit.model_.posterior_samples_[name])
+    torch.testing.assert_close(default.predict(X, s), explicit.predict(X, s))
+
+
+def test_gplfr_selects_direct_or_whitened_latent_parameterization():
+    from thousandworlds.models.gplfr import GPLFR
+
+    for parameterization, latent_name in (("direct_z", "Z_T"), ("whitened", "U_T")):
+        model = GPLFR(
+            latent_dim=1,
+            latent_parameterization=parameterization,
+            num_training_steps=1,
+            variable_weights="fixed",
+            output_coregionalization="none",
+            dtype=torch.float64,
+            device="cpu",
+        )
+        model.fit(
+            torch.tensor([[0.0, 0.0], [1.0, 0.0], [0.0, 1.0]]),
+            torch.zeros(3, dtype=torch.long),
+            torch.randn(3, 4, 1),
+            field_mask=torch.ones(3, 1, dtype=torch.bool),
+            sh_mask=torch.ones(4, 1, dtype=torch.bool),
+            field_names=["surface_temperature"],
+            n_sim_types=1,
+            verbose=False,
+        )
+        assert model.model_._latent_param_mode == parameterization
+        assert latent_name in model.model_.posterior_samples_
+
+    with pytest.raises(ValueError, match="latent_parameterization"):
+        GPLFR(latent_parameterization="invalid")
+
+
+def test_gplfr_forwards_optimizer_diagnostics_callback():
+    from thousandworlds.models.gplfr import GPLFR
+
+    calls = []
+    model = GPLFR(
+        latent_dim=1,
+        num_training_steps=2,
+        variable_weights="fixed",
+        output_coregionalization="none",
+        dtype=torch.float64,
+        device="cpu",
+    )
+    model.fit(
+        torch.tensor([[0.0, 0.0], [1.0, 0.0], [0.0, 1.0]]),
+        torch.zeros(3, dtype=torch.long),
+        torch.randn(3, 4, 1),
+        field_mask=torch.ones(3, 1, dtype=torch.bool),
+        sh_mask=torch.ones(4, 1, dtype=torch.bool),
+        field_names=["surface_temperature"],
+        n_sim_types=1,
+        verbose=False,
+        diagnostics_callback=lambda core, guide, svi, step, loss, Y, X, s: calls.append(
+            (step, loss, tuple(Y.shape), tuple(X.shape), tuple(s.shape))
+        ),
+    )
+    assert [call[0] for call in calls] == [0, 1]
+    assert all(np.isfinite(call[1]) for call in calls)
+    assert calls[0][2:] == ((3, 4, 1), (3, 2), (3,))
 
 
 def test_rerun_public_models_dry_run_exposes_gplfr():
@@ -260,7 +687,7 @@ def test_pca_ridge_resolver_defaults_and_config_replay():
     )
     hparams = run_model._pca_ridge_hparams(args)
     assert hparams["latent_dim"] == 50
-    assert hparams["n_folds"] == 3
+    assert hparams["n_folds"] == 5
 
     cfg = {
         "pca_ridge": {"latent_dim": 100, "lambda_reg": 0.1, "ppca_iters": 7},
@@ -304,7 +731,7 @@ def test_pca_gbt_resolver_defaults_and_config_replay():
     )
     hparams = run_model._pca_gbt_hparams(args)
     assert hparams["latent_dim"] == 150  # default ignores the generic --latent-dim unless explicit
-    assert hparams["n_folds"] == 3  # CV-sweep default (mirrors pca_ridge)
+    assert hparams["n_folds"] == 5  # CV-sweep default (mirrors pca_ridge)
     assert hparams["best_gbt_learning_rate"] is None  # no config -> fresh sweep
 
     args._explicit_args = {"latent_dim", "gbt_max_leaf_nodes"}
@@ -369,6 +796,26 @@ def test_pca_mlp_equal_group_mean_weights_groups_not_field_counts():
     field_names = ["surface_temperature", "temperature_0", "temperature_1"]
     out = _equal_group_mean(per_field, field_names)
     assert torch.isclose(out, torch.tensor(6.5))
+
+
+def test_pca_mlp_depth_is_native_and_config_replayable():
+    for depth in (1, 2):
+        model = _ScoreMLP(3, 2, 4, num_layers=depth, activation="silu")
+        assert sum(isinstance(layer, torch.nn.Linear) for layer in model.net) == depth + 1
+    args = run_model.argparse.Namespace(
+        subset="unused",
+        latent_dim=60,
+        hidden_width=128,
+        depth=2,
+        num_steps=3000,
+        lr=1.0e-3,
+        weight_decay=1.0e-3,
+        hard_stop_step=None,
+    )
+    assert run_model._pca_mlp_hparams(args)["depth"] == 2
+    assert run_model._pca_mlp_hparams(
+        args, {"pca_mlp": {"depth": 1}}
+    )["depth"] == 1
 
 
 def test_pca_mlp_restores_best_validation_step(monkeypatch):

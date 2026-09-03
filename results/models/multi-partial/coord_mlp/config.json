@@ -5,7 +5,7 @@
   "out_dir": "results/models/multi-partial/coord_mlp",
   "seed": 0,
   "dtype": "float32",
-  "device": "cpu",
+  "device": "cuda",
   "coord_mlp": {
     "hidden_width": 1024,
     "num_layers": 4,
@@ -16,6 +16,6 @@
     "lr": 0.0003,
     "weight_decay": 0.0,
     "hard_stop_step": 7800,
-    "preset": "multi-partial"
+    "preset": null
   }
 }

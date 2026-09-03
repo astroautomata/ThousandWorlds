@@ -8,7 +8,7 @@
   "device": "cpu",
   "pca_gbt": {
     "latent_dim": 150,
-    "learning_rate": 0.1,
+    "learning_rate": 0.05,
     "max_iter": 600,
     "max_leaf_nodes": 31,
     "min_samples_leaf": 10,
@@ -38,27 +38,11 @@
       63
     ],
     "objective": "equal_group_normalized_rmse",
-    "scores": [
-      [
-        0.3358058713376522,
-        0.3290450170636177,
-        0.3324201714247465
-      ],
-      [
-        0.3353898975998163,
-        0.328131964430213,
-        0.32995596565306184
-      ],
-      [
-        0.33342172726988795,
-        0.32588449865579605,
-        0.33000342510640623
-      ]
-    ]
+    "scores": null
   },
   "best": {
-    "learning_rate": 0.1,
+    "learning_rate": 0.05,
     "max_leaf_nodes": 31,
-    "cv_equal_group_normalized_rmse": 0.32588449865579605
+    "cv_equal_group_normalized_rmse": null
   }
 }

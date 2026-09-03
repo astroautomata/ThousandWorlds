@@ -6,291 +6,291 @@
   "fields": {
     "asr_cloudy": {
       "base_variable": "asr_cloudy",
-      "count": 206,
+      "count": 203,
       "num_coeffs": 484,
-      "sigma": 0.14978683232221668
+      "sigma": 0.15032918248311006
     },
     "cloud_fraction_0": {
       "base_variable": "cloud_fraction",
-      "count": 206,
+      "count": 203,
       "num_coeffs": 484,
-      "sigma": 7.127765814536226
+      "sigma": 5.8751120807325545
     },
     "cloud_fraction_1": {
       "base_variable": "cloud_fraction",
-      "count": 206,
+      "count": 203,
       "num_coeffs": 484,
-      "sigma": 7.014747706037239
+      "sigma": 5.593312290734224
     },
     "cloud_fraction_2": {
       "base_variable": "cloud_fraction",
-      "count": 206,
+      "count": 203,
       "num_coeffs": 484,
-      "sigma": 6.236624827167224
+      "sigma": 4.5829341456029
     },
     "cloud_fraction_3": {
       "base_variable": "cloud_fraction",
-      "count": 206,
+      "count": 203,
       "num_coeffs": 484,
-      "sigma": 5.422975628137741
+      "sigma": 3.7810513704184663
     },
     "cloud_fraction_4": {
       "base_variable": "cloud_fraction",
-      "count": 206,
+      "count": 203,
       "num_coeffs": 484,
-      "sigma": 4.876610875286406
+      "sigma": 3.3376708681118754
     },
     "cloud_fraction_5": {
       "base_variable": "cloud_fraction",
-      "count": 206,
+      "count": 203,
       "num_coeffs": 484,
-      "sigma": 5.193610237714582
+      "sigma": 3.5696865769045605
     },
     "cloud_fraction_6": {
       "base_variable": "cloud_fraction",
-      "count": 206,
+      "count": 203,
       "num_coeffs": 484,
-      "sigma": 4.828234489063586
+      "sigma": 3.170974489547215
     },
     "cloud_fraction_7": {
       "base_variable": "cloud_fraction",
-      "count": 206,
+      "count": 203,
       "num_coeffs": 484,
-      "sigma": 4.918489931298942
+      "sigma": 3.1867788689498076
     },
     "cloud_fraction_8": {
       "base_variable": "cloud_fraction",
-      "count": 206,
+      "count": 203,
       "num_coeffs": 484,
-      "sigma": 5.3805675375827215
+      "sigma": 3.593242103273119
     },
     "olr_cloudy": {
       "base_variable": "olr_cloudy",
-      "count": 206,
+      "count": 203,
       "num_coeffs": 484,
-      "sigma": 0.12509450550293916
+      "sigma": 0.12458433987954391
     },
     "specific_humidity_0": {
       "base_variable": "specific_humidity",
-      "count": 206,
+      "count": 203,
       "num_coeffs": 484,
-      "sigma": 8.35732547472344
+      "sigma": 8.328746897402326
     },
     "specific_humidity_1": {
       "base_variable": "specific_humidity",
-      "count": 206,
+      "count": 203,
       "num_coeffs": 484,
-      "sigma": 8.509769724697586
+      "sigma": 8.4408676080058
     },
     "specific_humidity_2": {
       "base_variable": "specific_humidity",
-      "count": 206,
+      "count": 203,
       "num_coeffs": 484,
-      "sigma": 8.876303294464087
+      "sigma": 8.812101483881632
     },
     "specific_humidity_3": {
       "base_variable": "specific_humidity",
-      "count": 206,
+      "count": 203,
       "num_coeffs": 484,
-      "sigma": 9.452636350466108
+      "sigma": 9.342379044008792
     },
     "specific_humidity_4": {
       "base_variable": "specific_humidity",
-      "count": 206,
+      "count": 203,
       "num_coeffs": 484,
-      "sigma": 10.479524405621397
+      "sigma": 10.260768783278245
     },
     "specific_humidity_5": {
       "base_variable": "specific_humidity",
-      "count": 206,
+      "count": 203,
       "num_coeffs": 484,
-      "sigma": 12.117496029989272
+      "sigma": 11.862919818393891
     },
     "specific_humidity_6": {
       "base_variable": "specific_humidity",
-      "count": 206,
+      "count": 203,
       "num_coeffs": 484,
-      "sigma": 13.71582705526474
+      "sigma": 13.480771044958011
     },
     "specific_humidity_7": {
       "base_variable": "specific_humidity",
-      "count": 206,
+      "count": 203,
       "num_coeffs": 484,
-      "sigma": 14.253260718763684
+      "sigma": 14.029269254804126
     },
     "specific_humidity_8": {
       "base_variable": "specific_humidity",
-      "count": 206,
+      "count": 203,
       "num_coeffs": 484,
-      "sigma": 13.90873637200124
+      "sigma": 13.721323843799617
     },
     "surface_temperature": {
       "base_variable": "surface_temperature",
-      "count": 206,
+      "count": 203,
       "num_coeffs": 484,
-      "sigma": 111.0039055098265
+      "sigma": 110.59985377298477
     },
     "temperature_0": {
       "base_variable": "temperature",
-      "count": 206,
+      "count": 203,
       "num_coeffs": 484,
-      "sigma": 79.12888463405866
+      "sigma": 78.90129416304904
     },
     "temperature_1": {
       "base_variable": "temperature",
-      "count": 206,
+      "count": 203,
       "num_coeffs": 484,
-      "sigma": 78.35288154408683
+      "sigma": 77.90029238298519
     },
     "temperature_2": {
       "base_variable": "temperature",
-      "count": 206,
+      "count": 203,
       "num_coeffs": 484,
-      "sigma": 77.93076098301302
+      "sigma": 76.72126422082076
     },
     "temperature_3": {
       "base_variable": "temperature",
-      "count": 206,
+      "count": 203,
       "num_coeffs": 484,
-      "sigma": 78.72517172101352
+      "sigma": 76.74060606999204
     },
     "temperature_4": {
       "base_variable": "temperature",
-      "count": 206,
+      "count": 203,
       "num_coeffs": 484,
-      "sigma": 82.2596293966049
+      "sigma": 79.69407597991479
     },
     "temperature_5": {
       "base_variable": "temperature",
-      "count": 206,
+      "count": 203,
       "num_coeffs": 484,
-      "sigma": 90.56170128242503
+      "sigma": 87.20659594549797
     },
     "temperature_6": {
       "base_variable": "temperature",
-      "count": 206,
+      "count": 203,
       "num_coeffs": 484,
-      "sigma": 104.69484892306279
+      "sigma": 101.75578133353004
     },
     "temperature_7": {
       "base_variable": "temperature",
-      "count": 206,
+      "count": 203,
       "num_coeffs": 484,
-      "sigma": 125.90444002698797
+      "sigma": 123.55055901050271
     },
     "temperature_8": {
       "base_variable": "temperature",
-      "count": 206,
+      "count": 203,
       "num_coeffs": 484,
-      "sigma": 125.04962375113406
+      "sigma": 124.59955471362798
     },
     "u_0": {
       "base_variable": "u",
-      "count": 206,
+      "count": 203,
       "num_coeffs": 484,
-      "sigma": 13.653394574704267
+      "sigma": 13.731292114110664
     },
     "u_1": {
       "base_variable": "u",
-      "count": 206,
+      "count": 203,
       "num_coeffs": 484,
-      "sigma": 16.900956732075773
+      "sigma": 17.066933983141038
     },
     "u_2": {
       "base_variable": "u",
-      "count": 206,
+      "count": 203,
       "num_coeffs": 484,
-      "sigma": 25.383503114605126
+      "sigma": 25.83635592231402
     },
     "u_3": {
       "base_variable": "u",
-      "count": 206,
+      "count": 203,
       "num_coeffs": 484,
-      "sigma": 38.560180604224804
+      "sigma": 38.91718419915983
     },
     "u_4": {
       "base_variable": "u",
-      "count": 206,
+      "count": 203,
       "num_coeffs": 484,
-      "sigma": 52.891827224773074
+      "sigma": 53.236765880248086
     },
     "u_5": {
       "base_variable": "u",
-      "count": 206,
+      "count": 203,
       "num_coeffs": 484,
-      "sigma": 63.430225293328675
+      "sigma": 63.612988516018795
     },
     "u_6": {
       "base_variable": "u",
-      "count": 206,
+      "count": 203,
       "num_coeffs": 484,
-      "sigma": 70.83351825624516
+      "sigma": 70.40330732066569
     },
     "u_7": {
       "base_variable": "u",
-      "count": 206,
+      "count": 203,
       "num_coeffs": 484,
-      "sigma": 78.7419224327861
+      "sigma": 78.5538147170697
     },
     "u_8": {
       "base_variable": "u",
-      "count": 206,
+      "count": 203,
       "num_coeffs": 484,
-      "sigma": 81.09338874494493
+      "sigma": 79.72969891971032
     },
     "v_0": {
       "base_variable": "v",
-      "count": 206,
+      "count": 203,
       "num_coeffs": 484,
-      "sigma": 7.337393459706445
+      "sigma": 7.4568703162555146
     },
     "v_1": {
       "base_variable": "v",
-      "count": 206,
+      "count": 203,
       "num_coeffs": 484,
-      "sigma": 8.552346824762164
+      "sigma": 8.698259823062271
     },
     "v_2": {
       "base_variable": "v",
-      "count": 206,
+      "count": 203,
       "num_coeffs": 484,
-      "sigma": 11.25938497706091
+      "sigma": 11.459610435349807
     },
     "v_3": {
       "base_variable": "v",
-      "count": 206,
+      "count": 203,
       "num_coeffs": 484,
-      "sigma": 14.622689027301526
+      "sigma": 14.862280874652
     },
     "v_4": {
       "base_variable": "v",
-      "count": 206,
+      "count": 203,
       "num_coeffs": 484,
-      "sigma": 16.775527424823476
+      "sigma": 17.138491804325845
     },
     "v_5": {
       "base_variable": "v",
-      "count": 206,
+      "count": 203,
       "num_coeffs": 484,
-      "sigma": 17.88766623558677
+      "sigma": 18.357040771859765
     },
     "v_6": {
       "base_variable": "v",
-      "count": 206,
+      "count": 203,
       "num_coeffs": 484,
-      "sigma": 18.217681488916448
+      "sigma": 18.73955750938034
     },
     "v_7": {
       "base_variable": "v",
-      "count": 206,
+      "count": 203,
       "num_coeffs": 484,
-      "sigma": 16.69246520984006
+      "sigma": 17.424891751483393
     },
     "v_8": {
       "base_variable": "v",
-      "count": 206,
+      "count": 203,
       "num_coeffs": 484,
-      "sigma": 14.043746259558743
+      "sigma": 14.72442932091948
     }
   },
   "grid_type": "legendre-gauss",

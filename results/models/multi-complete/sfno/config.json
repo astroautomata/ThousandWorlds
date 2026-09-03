@@ -1,0 +1,26 @@
+{
+  "method": "sfno",
+  "subset": "multi-complete",
+  "data_dir": "dataset",
+  "out_dir": "results/models/multi-complete/sfno",
+  "seed": 0,
+  "dtype": "float32",
+  "device": "cuda",
+  "sfno": {
+    "embed_dim": 768,
+    "num_layers": 2,
+    "batch_size": 32,
+    "num_steps": 3000,
+    "lr": 0.0003,
+    "weight_decay": 0.3,
+    "hard_stop_step": 3000,
+    "optimizer": "AdamW",
+    "target_normalization": "observed_training_latitude_weighted_per_field",
+    "loss": "latitude_weighted_masked_mse_divided_by_weighted_valid_mass",
+    "grid": "legendre-gauss",
+    "lmax_exclusive": 22,
+    "position_embedding": "learnable latlon",
+    "equatorial_symmetry": true,
+    "preset": null
+  }
+}

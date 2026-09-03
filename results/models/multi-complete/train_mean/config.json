@@ -5,5 +5,5 @@
   "out_dir": "results/models/multi-complete/train_mean",
   "seed": 0,
   "dtype": "float64",
-  "device": "auto"
+  "device": "cpu"
 }

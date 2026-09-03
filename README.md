@@ -7,12 +7,7 @@
 [![arXiv](https://img.shields.io/badge/arXiv-2606.18338-b31b1b.svg)](https://arxiv.org/abs/2606.18338)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue.svg)](pyproject.toml)
 
-The search for life beyond Earth depends on the molecular signatures it leaves behind in the atmospheres of its host planet. Correctly interpreting these signatures requires understanding the climates of potential host planets. **ThousandWorlds** is a benchmark for emulating these exoplanet climates: **1760 simulations** across 5 GCMs, 8 planet parameters, and atmospheric variables on a 32 x 64 x 10 latitude-longitude-pressure grid. It includes three nested benchmark subsets, two evaluation protocols, and eight released baseline methods.
-
-Explore the dataset + discovered exoplanets online with the [ThousandWorlds Explorer](https://thousandworldsexplorer.com)!
-Built by [Hamza Ali Shahjahan](https://github.com/hamza-ali-shahjahan)!
-
-<br>
+The search for life beyond Earth depends on the molecular signatures it leaves behind in the atmospheres of its host planet. Correctly interpreting these signatures requires understanding the climates of potential host planets. **ThousandWorlds** is a benchmark for emulating these exoplanet climates: **1689 simulations** across 5 GCMs, 8 planet parameters, and atmospheric variables on a 32 x 64 x 10 latitude-longitude-pressure grid. It includes three nested benchmark subsets, two evaluation protocols, and ten released baseline methods.
 
 ![ThousandWorlds dataset schematic](imgs/OVERVIEW.png)
 
@@ -61,7 +56,7 @@ tours an example world's climate.
 
 ## Baselines
 
-Published baseline prediction results are distributed as separate archives:
+Released baseline predictions are distributed as separate archives:
 
 ```bash
 python -c "import thousandworlds as tw; tw.download_baselines()"
@@ -76,12 +71,15 @@ python -m thousandworlds.run_model --config results/models/multi-partial/pca_mlp
 
 The first form runs a method on a subset with default hyperparameters (override
 with flags); the second reproduces a published baseline from its checked-in
-`config.json`. Each run writes predictions, metrics, and the resolved config to
+`config.json`. Each run writes predictions, metrics, and the complete config it ran with to
 `results/models/<subset>/<method>/`, overwriting the checked-in results by default
 (use `--out-dir` to redirect).
 
 See [`notebooks/pca_mlp.ipynb`](notebooks/pca_mlp.ipynb) for a quick example that
 trains a baseline in-notebook and compares its predictions to the targets.
+
+[`thousandworlds/models/README.md`](thousandworlds/models/README.md) describes
+each baseline and lists the released configurations.
 
 ## Repo Structure
 

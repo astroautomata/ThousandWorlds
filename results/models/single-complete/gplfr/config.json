@@ -7,15 +7,17 @@
   "dtype": "float64",
   "device": "cuda",
   "gplfr": {
+    "kernel": "matern32",
     "latent_dim": 150,
-    "num_training_steps": 135,
-    "inverse_temperature": 0.1,
-    "latent_nugget": 0.1,
+    "num_training_steps": 30,
+    "inverse_temperature": 0.03,
+    "latent_nugget": 0.03,
+    "n_samples": 64,
+    "variable_weights": "fixed",
+    "output_coregionalization": "none",
     "optimizer": {
       "lr_Z": 0.1,
       "lr_global": 0.3
-    },
-    "variable_weights": "fixed",
-    "output_coregionalization": "none"
+    }
   }
 }

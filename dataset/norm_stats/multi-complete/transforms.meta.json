@@ -109,7 +109,7 @@
     "cloud_fraction": [
       "smoothed_logit_Z-scaling",
       {
-        "epsilon": 0.002,
+        "epsilon": 0.01,
         "stat_key_pattern": "smoothed_logit_cloud_fraction"
       }
     ],
