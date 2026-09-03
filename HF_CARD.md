@@ -38,6 +38,9 @@ variables on a 32 x 64 x 10 latitude-longitude-pressure grid. It includes three
 nested benchmark subsets, two evaluation protocols, and ten released baseline
 methods.
 
+Explore the dataset + discovered exoplanets online with the [ThousandWorlds Explorer](https://thousandworldsexplorer.com)!
+Built by [Hamza Ali Shahjahan](https://github.com/hamza-ali-shahjahan)!
+
 [![Code](https://img.shields.io/badge/code-GitHub-181717.svg?logo=github)](https://github.com/edstevenson/ThousandWorlds)
 [![arXiv](https://img.shields.io/badge/arXiv-2606.18338-b31b1b.svg)](https://arxiv.org/abs/2606.18338)
 
