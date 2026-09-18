@@ -197,6 +197,6 @@ If you use ThousandWorlds, please cite the paper:
 ## Versions
 
 v2.0.0 replaces v1.0.0. It is a small update to the dataset to fix a couple
-bugs in some simulations and add a few more; the full list is in the
-[changelog](https://github.com/edstevenson/ThousandWorlds/blob/main/CHANGELOG.md).
+bugs in some simulations and add a few more simulations; the full list is in
+the [changelog](https://github.com/edstevenson/ThousandWorlds/blob/main/CHANGELOG.md).
 v1.0.0 remains available for reproducing earlier work.
