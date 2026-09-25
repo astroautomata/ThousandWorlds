@@ -42,6 +42,7 @@
     },
     "parentField": "cr:parentField",
     "path": "cr:path",
+    "prov": "http://www.w3.org/ns/prov#",
     "rai": "http://mlcommons.org/croissant/RAI/",
     "recordSet": "cr:recordSet",
     "references": "cr:references",
@@ -328,8 +329,8 @@
       ],
       "description": "Baseline prediction NPZ files inside the baseline result archives.",
       "encodingFormat": "application/x-numpy",
-      "includes": "results/models/<subset>/<method>/predictions.npz",
-      "name": "results/models/<subset>/<method>/predictions.npz"
+      "includes": "results/models/*/*/predictions*.npz",
+      "name": "results/models/*/*/predictions*.npz"
     },
     {
       "@id": "baseline-metadata",
@@ -379,6 +380,104 @@
   ],
   "license": "https://creativecommons.org/licenses/by/4.0/",
   "name": "ThousandWorlds",
+  "prov:wasDerivedFrom": [
+    {
+      "@type": "prov:Entity",
+      "name": "Mak et al. [2024]",
+      "url": "https://doi.org/10.1093/mnras/stae741"
+    },
+    {
+      "@type": "prov:Entity",
+      "name": "Sergeev et al. [2022]",
+      "url": "https://doi.org/10.3847/PSJ/ac6cf2"
+    },
+    {
+      "@type": "prov:Entity",
+      "name": "Hammond et al. [2025]",
+      "url": "https://doi.org/10.3847/1538-4357/adc73b"
+    },
+    {
+      "@type": "prov:Entity",
+      "name": "Haqq-Misra et al. [2022]",
+      "url": "https://doi.org/10.3847/PSJ/ac9479"
+    },
+    {
+      "@type": "prov:Entity",
+      "name": "Wolf et al. [2025]",
+      "url": "https://doi.org/10.3847/PSJ/ae031e"
+    },
+    {
+      "@type": "prov:Entity",
+      "name": "Komacek and Abbot [2019]",
+      "url": "https://doi.org/10.3847/1538-4357/aafb33"
+    },
+    {
+      "@type": "prov:Entity",
+      "name": "kumar Kopparapu et al. [2016]",
+      "url": "https://doi.org/10.3847/0004-637X/819/1/84"
+    },
+    {
+      "@type": "prov:Entity",
+      "name": "kumar Kopparapu et al. [2017]",
+      "url": "https://doi.org/10.3847/1538-4357/aa7cf9"
+    },
+    {
+      "@type": "prov:Entity",
+      "name": "Wolf et al. [2019]",
+      "url": "https://doi.org/10.3847/1538-4357/ab184a"
+    },
+    {
+      "@type": "prov:Entity",
+      "name": "Wolf [2017]",
+      "url": "https://doi.org/10.3847/2041-8213/aa693a"
+    },
+    {
+      "@type": "prov:Entity",
+      "name": "Suissa et al. [2020]",
+      "url": "https://doi.org/10.3847/1538-3881/aba4b4"
+    },
+    {
+      "@type": "prov:Entity",
+      "name": "Macdonald et al. [2025]",
+      "url": "https://doi.org/10.3847/1538-4357/adb0cb"
+    },
+    {
+      "@type": "prov:Entity",
+      "name": "Paradise et al. [2021]",
+      "url": "https://doi.org/10.1016/j.icarus.2020.114301"
+    },
+    {
+      "@type": "prov:Entity",
+      "name": "Paradise et al. [2022a]",
+      "url": "https://doi.org/10.1093/mnras/stac172"
+    },
+    {
+      "@type": "prov:Entity",
+      "name": "Paradise et al. [2022b]",
+      "url": "https://doi.org/10.1093/mnras/stac724"
+    },
+    {
+      "@type": "prov:Entity",
+      "name": "Woodward et al. [in preparation]",
+      "url": "https://arxiv.org/abs/2606.18338"
+    },
+    {
+      "@type": "prov:Entity",
+      "name": "this work",
+      "url": "https://arxiv.org/abs/2606.18338"
+    }
+  ],
+  "prov:wasGeneratedBy": {
+    "@type": "prov:Activity",
+    "description": "Time-averaged outputs from ExoCAM, ExoCAM-pre-2022, UM, LFRic, and ExoPlaSim were collected from the cited studies and unpublished contributions, alongside 424 bespoke simulations selected using a weighted space-filling design. Source entities match the source labels in inputs.csv; their URLs document the underlying simulation collections, rather than claiming separate raw-data archives. The ThousandWorlds paper documents the bespoke and in-preparation contributions. Fields were regridded to a 32 x 64 horizontal grid and ten relative pressure levels, symmetrized about the equator (antisymmetrized for north-south wind), and fields with partial spatial coverage were marked wholly unobserved. T21 spherical-harmonic coefficients and predefined train/test splits were exported, with planets kept together across GCMs to prevent leakage. The paper describes the simulation settings and processing; the dataset documentation describes the released files; the code defines model-input/output transforms; the changelog records v2.0.0 corrections.",
+    "name": "ThousandWorlds simulation collection and benchmark construction",
+    "url": [
+      "https://arxiv.org/abs/2606.18338",
+      "https://github.com/astroautomata/ThousandWorlds/blob/main/dataset/README.md",
+      "https://github.com/astroautomata/ThousandWorlds/blob/main/thousandworlds/preprocessing.py",
+      "https://github.com/astroautomata/ThousandWorlds/blob/main/CHANGELOG.md"
+    ]
+  },
   "rai:dataBiases": "The dataset reflects simulator, parameter-design, and preprocessing choices: ExoCAM and UM are target GCMs, auxiliary simulations are not uniformly represented across all benchmark subsets, and model behavior can depend on the released variable coverage and missing-field patterns.",
   "rai:dataLimitations": "ThousandWorlds is a benchmark built from numerical exoplanet climate simulations, not observed planets. It is restricted to the released target physical domain, GCM choices, variables, spatial grid, temporal sampling, and benchmark split definitions, and should not be used as direct evidence for habitability, mission planning, or validated climate prediction outside those regimes.",
   "rai:dataSocialImpact": "Potential benefits include reproducible comparison of climate-emulation methods and broader access to expensive simulation-derived benchmark data. Main risks are overinterpreting benchmark scores or synthetic simulation outputs as observational truth; mitigations include explicit split definitions, public baseline artifacts, documented limitations, and open release metadata.",

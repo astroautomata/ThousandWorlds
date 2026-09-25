@@ -79,7 +79,9 @@ The release includes:
 - `archives/dataset.tar.gz`: the ThousandWorlds dataset.
 - `archives/results-baselines-*.tar.gz`: baseline predictions for the 3
   subsets.
-- `croissant.json`: Croissant metadata.
+- [`croissant.json`](croissant.json): full-dataset Croissant metadata, including
+  Responsible AI fields and provenance links. Use this custom file for the full
+  benchmark; Hugging Face's automatic Croissant export covers only the input table.
 - `archives/*.sha256`: checksum sidecars.
 
 ## Dataset Contents
@@ -166,9 +168,8 @@ as false entries in the spectral `field_mask`.
 The package includes loaders and metrics for two benchmark protocols:
 
 - **Standard**: the main test protocol.
-- **Shared-planets**: evaluate on planets shared across target and auxiliary
-  GCMs; used to assess performance relative to inter-GCM error, i.e. how close
-  a model gets to the epistemic uncertainty floor of the problem.
+- **Shared-planets**: evaluate on planets simulated by both target GCMs
+  (UM and ExoCAM), reporting emulator scores relative to inter-GCM disagreement.
 
 Headline baselines are `train_mean`, `knn`, `pca_gbt`, `coord_mlp`, `coord_deeponet`, `pca_mlp`, `conv_decoder`, `sfno`, `ppca_icm`, and `gplfr`. PCA-Ridge (`pca_ridge`) is the nonlinearity ablation. The baseline archives include predictions,
 the config each run used, and metrics JSON files.

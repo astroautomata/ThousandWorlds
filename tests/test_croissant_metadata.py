@@ -40,3 +40,21 @@ def test_croissant_metadata_is_1_1_and_internally_consistent():
         for item in metadata["distribution"]
         if item["@id"].startswith(("dataset-archive", "baseline-results"))
     )
+
+
+def test_croissant_covers_released_predictions_and_provenance():
+    import csv
+    from fnmatch import fnmatch
+
+    root = Path(__file__).parents[1]
+    metadata = json.loads((root / "croissant.json").read_text())
+    pattern = next(item["includes"] for item in metadata["distribution"] if item["@id"] == "baseline-predictions")
+    with (root / "results/scores.csv").open() as handle:
+        paths = {row["predictions_path"] for row in csv.DictReader(handle) if row["predictions_path"]}
+    assert paths and all(fnmatch(path, pattern) for path in paths)
+    with (root / "dataset/inputs.csv").open() as handle:
+        sources = {row["source"] for row in csv.DictReader(handle)}
+    assert sources == {entity["name"] for entity in metadata["prov:wasDerivedFrom"]}
+    assert all(entity["url"].startswith("https://") for entity in metadata["prov:wasDerivedFrom"])
+    assert metadata["@context"]["prov"] == "http://www.w3.org/ns/prov#"
+    assert metadata["prov:wasGeneratedBy"]["@type"] == "prov:Activity"
