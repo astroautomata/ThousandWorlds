@@ -569,7 +569,7 @@
           "@id": "inputs/co2",
           "@type": "cr:Field",
           "dataType": "sc:Float",
-          "description": "Atmospheric CO2 setting used by the simulation.",
+          "description": "Atmospheric CO2 volume fraction (0 to 1) used by the simulation.",
           "name": "co2",
           "source": {
             "extract": {
@@ -584,7 +584,7 @@
           "@id": "inputs/ch4",
           "@type": "cr:Field",
           "dataType": "sc:Float",
-          "description": "Atmospheric CH4 setting used by the simulation.",
+          "description": "Atmospheric CH4 volume fraction (0 to 1) used by the simulation.",
           "name": "ch4",
           "source": {
             "extract": {

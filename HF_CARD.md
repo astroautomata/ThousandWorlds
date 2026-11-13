@@ -120,16 +120,19 @@ rotation period, surface pressure, CO2, CH4, and `gcm_label`. The metadata also
 includes `is_target_gcm`, `in_target_physical_domain`, `planet_id`, and
 `source`.
 
-| Parameter | Range |
-| --- | --- |
-| Radius (Earth radii) | [0.7, 1.75] |
-| Surface gravity (m s^-2) | [6.0, 17.0] |
-| Rotation period (days) | [1.0, 200.0] |
-| Surface pressure (bar) | [0.5, 5] |
-| CO2 volume fraction (%) | [0, 100] |
-| CH4 volume fraction (%) | [0, 5] |
-| Incident stellar flux (W m^-2) | [500, 1500] |
-| Stellar temperature (K) | [2500, 5800] |
+`inputs.csv` stores radius in metres, surface pressure in pascals, and CO2 and
+CH4 as volume fractions between 0 and 1.
+
+| Parameter | Range | Column in `inputs.csv` (stored unit) |
+| --- | --- | --- |
+| Radius (Earth radii) | [0.7, 1.75] | `radius` (m) |
+| Surface gravity (m s^-2) | [6.0, 17.0] | `gravity` (m s^-2) |
+| Rotation period (days) | [1.0, 200.0] | `rotation_period` (days) |
+| Surface pressure (bar) | [0.5, 5] | `surface_pressure` (Pa) |
+| CO2 volume fraction (%) | [0, 100] | `co2` (volume fraction, 0–1) |
+| CH4 volume fraction (%) | [0, 5] | `ch4` (volume fraction, 0–1) |
+| Incident stellar flux (W m^-2) | [500, 1500] | `stellar_flux` (W m^-2) |
+| Stellar temperature (K) | [2500, 5800] | `stellar_temperature` (K) |
 
 ## Outputs
 
